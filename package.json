@@ -1,0 +1,18 @@
+{
+  "name": "ts-swagger-type-checker",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "tamuraryoya <tamuraryoya@team-lab.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "parcel watch src/index.ts",
+    "start": "nodemon dist/index"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.9",
+    "parcel-bundler": "^1.11.0"
+  },
+  "dependencies": {
+    "typescript": "^3.2.2"
+  }
+}
