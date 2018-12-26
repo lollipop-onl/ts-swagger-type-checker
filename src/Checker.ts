@@ -175,8 +175,8 @@ export default class Checker {
       // * 配列の場合
       if (s1.type === 'array') {
         // * itemを型に合わせて変更
-        const type1 = s1.items.type;
-        const type2 = s2.items.type;
+        const type1 = s1.items.type || 'object';
+        const type2 = s2.items.type || 'object';
 
         if (type1 !== type2) {
           return consola.error(`Different Types: "${key}" (${type1} vs ${type2})`);
