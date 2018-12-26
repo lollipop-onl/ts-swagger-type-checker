@@ -1,5 +1,8 @@
 {
   "compilerOptions": {
-    "esModuleInterop": true
+    "lib": ["esnext"],
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "target": "es5"
   }
 }

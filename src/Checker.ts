@@ -1,0 +1,174 @@
+/**
+ * @file スキーマ同士のチェックを行うモジュール
+ */
+
+import Schema from './Schema';
+import Logger from './Logger';
+import consola from 'consola';
+import * as TJS from 'typescript-json-schema';
+
+export default class Checker {
+  private logger;
+
+  constructor(
+    private target: string,
+    private config: any,
+    private baseDir: string
+  ) {
+    this.logger = new Logger();
+  }
+
+  public check(): void {
+    const tsSchema = this.getTSSchema();
+    const { definitions } = tsSchema;
+
+    Object.keys(definitions).forEach((key) => {
+      const definition = definitions[key];
+      const { properties, description } = definition;
+      const { path, method, type } = this.parseMetaComment(description);
+
+      // メタ情報のどれかが掛けていたら処理を終了
+      if (!path || !method || !type) return;
+
+      consola.info(`Checking... ${method}: ${path} - ${type}`);
+
+      const schema = Schema.getSwaggerSchema(this.config, path, method, type);
+
+      this.validateSchema(properties, tsSchema, schema, this.config);
+
+      consola.success(`Finish`);
+    });
+  }
+
+  /**
+   * TypeScriptの型定義を取得する
+   */
+  private getTSSchema(target = this.target): any | void {
+    const tsConfig = {
+      baseUrl: this.baseDir,
+      paths: {
+        '@/*': [
+          'src/*'
+        ]
+      },
+    };
+    const program = TJS.getProgramFromFiles([target], tsConfig);
+    const schema = TJS.generateSchema(program, '*');
+
+    if (!schema) return {};
+
+    return schema;
+  }
+
+  /**
+   * メタコメントをパースする
+   */
+  private parseMetaComment(comment = ''): any {
+    const { path, method, type } = comment.replace(/ /g, '').split('\n').reduce((obj, item) => {
+      const [key, value] = item.split(':');
+
+      if (key && value) {
+        obj[key] = value;
+      }
+
+      return obj;
+    }, {} as any);
+
+    return { path, method, type };
+  }
+
+  /**
+   * $refのコンポーネントを取得する
+   */
+  getSchemaRef(obj, config): any {
+    const [ $ref ] = Object.keys(obj);
+
+    if ($ref !== '$ref') return obj;
+
+    const key = obj[$ref];
+
+    const def = key.replace(/^#\//, '').split('/').reduce((obj, name) => {
+      return obj[name] || {};
+    }, config);
+
+    if (def.name && def.schema) {
+      return {
+        [def.name]: def.schema
+      };
+    }
+
+    return def;
+  }
+
+  /**
+   * スキーマを正規化する
+   */
+  optimizeSchema(schema, config): any {
+    const _schema = Array.isArray(schema) ? schema : [schema];
+
+    const parsedSchema = _schema.reduce((obj, self) => {
+      return {
+        ...obj,
+        ...this.getSchemaRef(self, config)
+      };
+    }, {});
+
+    const keys = Object.keys(parsedSchema);
+
+    // レスポンスの場合
+    if (keys.includes('properties')) {
+      return parsedSchema['properties'];
+    }
+
+    // Queryパラメータの場合
+    if (parsedSchema.in === 'query') {
+      return {
+        [parsedSchema['name']]: parsedSchema['schema']
+      };
+    }
+
+    return parsedSchema;
+  }
+
+  /**
+   * スキーマ同士を検証する
+   */
+  validateSchema(schema1 = {}, def1 = {}, schema2 = {}, def2 = {}): void {
+    const optimizedSchema1 = this.optimizeSchema(schema1, def1);
+    const optimizedSchema2 = this.optimizeSchema(schema2, def2);
+
+    const keys1 = Object.keys(optimizedSchema1);
+    const keys2 = Object.keys(optimizedSchema2);
+
+    // 不足しているプロパティのチェック
+    keys2.forEach((key) => {
+      if (!keys1.includes(key)) {
+        return consola.warn(`Missing property "${key}"`);
+      }
+    });
+
+    // 定義されていないプロパティのチェック
+    keys1.forEach((key) => {
+      if (!keys2.includes(key)) {
+        return consola.warn(`Unknown property "${key}"`);
+      }
+    });
+
+    const keys = keys1.filter((key) => keys2.includes(key));
+
+    keys.forEach((key) => {
+      const s1 = optimizedSchema1[key];
+      const s2 = optimizedSchema2[key];
+
+      // * 型が一致するかをチェック
+      if (s1.type !== s2.type) {
+        return consola.warn(`Different Types: "${key}" (${s1.type} vs ${s2.type})`);
+      }
+
+      // * 配列の場合
+      if (s1.type === 'array') {
+        this.validateSchema(s1.items, def1, s2.items, def2);
+      }
+    });
+  }
+}

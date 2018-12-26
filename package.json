@@ -5,14 +5,23 @@
   "author": "tamuraryoya <tamuraryoya@team-lab.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "parcel watch src/index.ts",
-    "start": "nodemon dist/index"
+    "dev": "parcel watch src/index.ts -t node",
+    "start": "nodemon dist/index.js",
+    "check": "node dist/index.js",
+    "clean:temp": "rm -r .temp__*"
   },
   "devDependencies": {
     "nodemon": "^1.18.9",
     "parcel-bundler": "^1.11.0"
   },
   "dependencies": {
-    "typescript": "^3.2.2"
+    "commander": "^2.19.0",
+    "consola": "^2.3.0",
+    "glob": "^7.1.3",
+    "js-yaml": "^3.12.0",
+    "rmdir": "^1.2.0",
+    "typescript": "^3.2.2",
+    "typescript-json-schema": "^0.33.0",
+    "uniqid": "^5.0.3"
   }
 }
