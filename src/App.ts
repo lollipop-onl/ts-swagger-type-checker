@@ -6,6 +6,7 @@ import consola from 'consola';
 import glob from 'glob';
 import path from 'path';
 import rmdir from 'rmdir';
+import uniqid from 'uniqid';
 import yaml from 'js-yaml';
 import Checker from './Checker';
 
@@ -80,7 +81,8 @@ export default class App {
     files.forEach((file) => {
       promises.push(new Promise((resolve) => {
         // コピー後のファイル名の拡張子を.tsにする
-        const copyedFileName = file.replace(/(.*)\/(.+)\.d\.ts$/, '$2.ts');
+        // const copyedFileName = file.replace(/(.*)\/(.+)\.d\.ts$/, '$2.ts');
+        const copyedFileName = `${uniqid()}.ts`;
         const copyedPath = path.resolve(this.tempDir, copyedFileName);
 
         fs.copyFile(file, copyedPath, resolve);
