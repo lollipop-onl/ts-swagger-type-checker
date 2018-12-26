@@ -1,7 +1,6 @@
 {
   "name": "ts-swagger-type-checker",
   "version": "1.0.0",
-  "main": "index.js",
   "author": "tamuraryoya <tamuraryoya@team-lab.com>",
   "license": "MIT",
   "scripts": {
@@ -9,6 +8,9 @@
     "start": "nodemon dist/index.js",
     "check": "node dist/index.js",
     "clean:temp": "rm -r .temp__*"
+  },
+  "bin": {
+    "api-check": "dist/index"
   },
   "devDependencies": {
     "nodemon": "^1.18.9",
