@@ -2,7 +2,7 @@
 
 # App
 .cache
-.temp__*
+.temp
 dist
 
 # Logs

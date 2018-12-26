@@ -23,6 +23,8 @@ export default class App {
    * チェックを実行する
    */
   public async exec(): Promise<void> {
+    consola.info('Type check started!');
+
     this.config = this.loadSwaggerConfig();
 
     if (!this.config) return consola.error(`${this.configFile}の定義ファイルを読み込めませんでした。`);
