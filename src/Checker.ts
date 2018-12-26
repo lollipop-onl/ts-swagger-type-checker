@@ -30,13 +30,17 @@ export default class Checker {
       // メタ情報のどれかが掛けていたら処理を終了
       if (!path || !method || !type) return;
 
+      console.log('--');
       consola.info(`Checking... ${method}: ${path} - ${type}`);
 
       const schema = Schema.getSwaggerSchema(this.config, path, method, type);
 
+      // Swaggerの定義が見つからなければ処理を中止
+      if (!schema) return consola.warn(`Swagger definition is not found... ${path}: ${method} - ${type}`);
+
       this.validateSchema(properties, tsSchema, schema, this.config);
 
-      consola.success(`Finish`);
+      consola.success('Finish !');
     });
   }
 
@@ -143,14 +147,14 @@ export default class Checker {
     // 不足しているプロパティのチェック
     keys2.forEach((key) => {
       if (!keys1.includes(key)) {
-        return consola.warn(`Missing property "${key}"`);
+        return consola.error(`Missing property "${key}"`);
       }
     });
 
     // 定義されていないプロパティのチェック
     keys1.forEach((key) => {
       if (!keys2.includes(key)) {
-        return consola.warn(`Unknown property "${key}"`);
+        return consola.error(`Unknown property "${key}"`);
       }
     });
 
@@ -162,7 +166,7 @@ export default class Checker {
 
       // * 型が一致するかをチェック
       if (s1.type !== s2.type) {
-        return consola.warn(`Different Types: "${key}" (${s1.type} vs ${s2.type})`);
+        return consola.error(`Different Types: "${key}" (${s1.type} vs ${s2.type})`);
       }
 
       // * 配列の場合
