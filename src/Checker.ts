@@ -30,7 +30,6 @@ export default class Checker {
       // メタ情報のどれかが掛けていたら処理を終了
       if (!path || !method || !type) return;
 
-      console.log('--');
       consola.info(`Checking... ${method}: ${path} - ${type}`);
 
       const schema = Schema.getSwaggerSchema(this.config, path, method, type);

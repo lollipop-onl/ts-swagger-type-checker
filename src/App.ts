@@ -35,14 +35,16 @@ export default class App {
     // * チェック対象のファイルを取得
     const targetFiles = glob.sync(path.resolve(this.tempDir, '*.ts'));
 
-    consola.info(`Number of targets: ${targetFiles.length} file(s)`);
+    consola.info(`Targets: ${targetFiles.length} file(s)`);
 
     if (targetFiles.length === 0) {
       return consola.warn('チェック対象のファイルがありません。');
     }
 
-    targetFiles.forEach((target) => {
+    targetFiles.forEach((target, i) => {
       const checker = new Checker(target, this.config, this.baseDir);
+
+      console.log(`\n👀 ${i + 1} / ${targetFiles.length}\n`);
 
       checker.check();
     });
