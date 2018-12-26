@@ -9,6 +9,12 @@
     "check": "node dist/index.js",
     "clean:temp": "rm -r .temp__*"
   },
+  "files": [
+    "README.md",
+    "package.json",
+    "bin",
+    "dist"
+  ],
   "bin": {
     "api-type-check": "bin/script"
   },
