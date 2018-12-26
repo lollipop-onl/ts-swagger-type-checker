@@ -34,6 +34,8 @@ export default class App {
     // * チェック対象のファイルを取得
     const targetFiles = glob.sync(path.resolve(this.tempDir, '*.ts'));
 
+    consola.info(`Number of targets: ${targetFiles.length} file(s)`);
+
     if (targetFiles.length === 0) {
       return consola.warn('チェック対象のファイルがありません。');
     }
@@ -66,6 +68,9 @@ export default class App {
     const filePattern = path.resolve(path.resolve(this.baseDir, this.pattern));
     const files = glob.sync(filePattern);
     const promises = [];
+
+    // * 一旦、仮フォルダを削除
+    await (() => new Promise((resolve) => rmdir(this.tempDir, resolve)))();
 
     // * 仮ファイル格納のディレクトリが存在しない場合は作成
     if (!fs.existsSync(this.tempDir)) {
