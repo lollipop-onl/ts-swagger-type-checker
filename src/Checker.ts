@@ -165,13 +165,26 @@ export default class Checker {
       const s2 = optimizedSchema2[key];
 
       // * 型が一致するかをチェック
-      if (s1.type !== s2.type) {
-        return consola.error(`Different Types: "${key}" (${s1.type} vs ${s2.type})`);
+      const type1 = s1.type || 'object';
+      const type2 = s2.type || 'object';
+
+      if (type1 !== type2) {
+        return consola.error(`Different Types: "${key}" (${type1} vs ${type2})`);
       }
 
       // * 配列の場合
       if (s1.type === 'array') {
-        this.validateSchema(s1.items, def1, s2.items, def2);
+        // * itemを型に合わせて変更
+        const type1 = s1.items.type;
+        const type2 = s2.items.type;
+
+        if (type1 !== type2) {
+          return consola.error(`Different Types: "${key}" (${type1} vs ${type2})`);
+        }
+
+        if (type1 === 'object') {
+          this.validateSchema(s1.items, def1, s2.items, def2);
+        }
       }
     });
   }
