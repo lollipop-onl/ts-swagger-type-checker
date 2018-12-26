@@ -1,26 +1,21 @@
 {
   "name": "ts-swagger-type-checker",
-  "version": "0.0.1",
-  "author": "tamuraryoya <tamuraryoya@team-lab.com>",
+  "version": "0.1.0",
   "license": "MIT",
+  "author": "tamuraryoya <tamuraryoya@team-lab.com>",
+  "bin": {
+    "api-type-check": "./bin/api-type-check"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:tamuraryoya/ts-swagger-type-checker.git"
+  },
   "scripts": {
     "dev": "parcel watch src/index.ts -t node",
+    "build": "parcel build src/index.ts -t node -d lib --no-source-maps",
     "start": "nodemon dist/index.js",
     "check": "node dist/index.js",
     "clean:temp": "rm -r .temp__*"
-  },
-  "files": [
-    "README.md",
-    "package.json",
-    "bin",
-    "dist"
-  ],
-  "bin": {
-    "api-type-check": "bin/script"
-  },
-  "devDependencies": {
-    "nodemon": "^1.18.9",
-    "parcel-bundler": "^1.11.0"
   },
   "dependencies": {
     "commander": "^2.19.0",
@@ -31,5 +26,9 @@
     "typescript": "^3.2.2",
     "typescript-json-schema": "^0.33.0",
     "uniqid": "^5.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.9",
+    "parcel-bundler": "^1.11.0"
   }
 }

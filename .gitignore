@@ -3,6 +3,7 @@
 # App
 .cache
 .temp__*
+dist
 
 # Logs
 logs
